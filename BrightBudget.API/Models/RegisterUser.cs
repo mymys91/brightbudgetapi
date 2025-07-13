@@ -1,7 +1,8 @@
 using System.ComponentModel.DataAnnotations;
+
 using BrightBudgetApp.Core.Attributes;
 
-namespace BrightBudget.Core.Models
+namespace BrightBudget.API.Models
 {
     public class RegisterRequest
     {

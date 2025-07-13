@@ -6,6 +6,6 @@ namespace BrightBudget.API.Common
     {
         public bool Success { get; set; } = false;
         public string? Message { get; set; }
-        public IDictionary<string, string[]> Errors { get; set; }  = new Dictionary<string, string[]>();     
+        public IDictionary<string, string[]> Errors { get; set; } = new Dictionary<string, string[]>();
     }
 }

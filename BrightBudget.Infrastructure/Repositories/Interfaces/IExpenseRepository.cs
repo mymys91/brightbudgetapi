@@ -1,6 +1,7 @@
-using BrightBudget.Core.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+
+using BrightBudget.Core.Models;
 
 namespace BrightBudget.Infrastructure.Repositories.Interfaces
 {

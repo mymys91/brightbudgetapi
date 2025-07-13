@@ -1,9 +1,11 @@
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
 using BrightBudget.Core.Models;
 using BrightBudget.Infrastructure.Data;
 using BrightBudget.Infrastructure.Repositories.Interfaces;
+
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace BrightBudget.Infrastructure.Repositories.Implementations
 {
@@ -17,7 +19,7 @@ namespace BrightBudget.Infrastructure.Repositories.Implementations
         }
         public async Task<User?> GetByEmailAsync(string email)
         {
-             return await _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
+            return await _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
         }
         public async Task<User?> GetByIdAsync(int userId)
         {

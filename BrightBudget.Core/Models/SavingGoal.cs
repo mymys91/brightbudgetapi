@@ -19,7 +19,7 @@ namespace BrightBudget.Core.Models
 
         [Required]
         public int UserId { get; set; }
-        
+
         public ICollection<SavingTransaction> Transactions { get; set; } = new List<SavingTransaction>();
     }
 }

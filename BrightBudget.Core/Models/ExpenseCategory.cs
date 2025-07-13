@@ -10,7 +10,7 @@ namespace BrightBudget.Core.Models
         [MaxLength(200)]
         public string Name { get; set; } = string.Empty;
 
-        [Required]    
+        [Required]
         public int? UserId { get; set; }
 
         public ICollection<Expense>? Expenses { get; set; }

@@ -1,9 +1,11 @@
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
 using BrightBudget.Core.Models;
 using BrightBudget.Infrastructure.Data;
 using BrightBudget.Infrastructure.Repositories.Interfaces;
+
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace BrightBudget.Infrastructure.Repositories.Implementations
 {

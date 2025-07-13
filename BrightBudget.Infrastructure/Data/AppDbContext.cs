@@ -1,5 +1,6 @@
-using Microsoft.EntityFrameworkCore;
 using BrightBudget.Core.Models;
+
+using Microsoft.EntityFrameworkCore;
 
 namespace BrightBudget.Infrastructure.Data
 {

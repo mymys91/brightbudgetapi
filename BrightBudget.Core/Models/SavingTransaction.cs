@@ -12,7 +12,7 @@ namespace BrightBudget.Core.Models
         public DateTime TransactionDate { get; set; }
         public string? Note { get; set; }
 
-         [Required]
+        [Required]
         public int SavingGoalId { get; set; }
 
         [ForeignKey("SavingGoalId")]

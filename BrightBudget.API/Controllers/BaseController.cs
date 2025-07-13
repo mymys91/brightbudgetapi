@@ -1,4 +1,5 @@
 using BrightBudget.API.Common;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -15,15 +16,15 @@ namespace BrightBudget.API.Controllers
         }
 
         // Standardized success response
-        protected IActionResult Success(object? result = null)
+        protected IActionResult Success<T>(T data, string? message = null)
         {
-            return Ok(new { success = true, data = result });
+            return Ok(ApiResponse<T>.Ok(data, message));
         }
 
         // Standardized error response
         protected IActionResult Error(string message)
         {
-            return BadRequest(new { success = false, error = message });
+            return BadRequest(ApiResponse<string>.Fail(message));
         }
 
         protected IActionResult InvalidModelState()

@@ -1,6 +1,13 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+
+using BrightBudget.API.Models;
 using BrightBudget.Core.Models;
 using BrightBudget.Infrastructure.Repositories.Interfaces;
+
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 
 namespace BrightBudget.API.Controllers
 {
@@ -9,11 +16,13 @@ namespace BrightBudget.API.Controllers
     public class UserController : BaseController
     {
         private readonly IUserRepository _repo;
+        private readonly IConfiguration _config;
 
-        public UserController(IUserRepository repo, ILogger<UserController> logger)
+        public UserController(IUserRepository repo, IConfiguration config, ILogger<UserController> logger)
             : base(logger)
         {
             _repo = repo;
+            _config = config;
         }
 
         [HttpPost("register")]
@@ -42,7 +51,42 @@ namespace BrightBudget.API.Controllers
             return Success("Account created successfully.");
         }
 
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginRequest request)
+        {
+            // Trim and sanitize
+            var email = request.Email.Trim().ToLowerInvariant();
+            var password = request.Password.Trim();
 
+            if (!ModelState.IsValid)
+                return InvalidModelState();
+
+            var user = await _repo.GetByEmailAsync(email);
+            if (user == null || !BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
+                return Error("Invalid email or password.");
+
+            // Create JWT claims
+            var claims = new[]
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Email, user.Email)
+            };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var expires = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_config["Jwt:ExpiresInMinutes"]));
+
+            var token = new JwtSecurityToken(
+                issuer: _config["Jwt:Issuer"],
+                audience: _config["Jwt:Audience"],
+                claims: claims,
+                expires: expires,
+                signingCredentials: creds
+            );
+
+            var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+
+            return Success(new { token = tokenString }, "Login successful.");
+        }
     }
-
 }
