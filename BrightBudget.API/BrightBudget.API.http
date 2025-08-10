@@ -1,6 +1,68 @@
 @BrightBudget.API_HostAddress = http://localhost:5266
 
-GET {{BrightBudget.API_HostAddress}}/weatherforecast/
-Accept: application/json
+# Authentication Endpoints
+
+## Register a new user
+POST {{BrightBudget.API_HostAddress}}/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "TestPassword123!"
+}
+
+###
+
+## Login to get access token and refresh token
+POST {{BrightBudget.API_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "TestPassword123!"
+}
+
+###
+
+## Get current user info (requires authentication)
+GET {{BrightBudget.API_HostAddress}}/api/auth/me
+Authorization: Bearer your_access_token_here
+
+###
+
+## Use refresh token to get new access token
+# Replace the tokens with actual values from login response
+POST {{BrightBudget.API_HostAddress}}/api/auth/refresh
+Content-Type: application/json
+
+{
+  "accessToken": "your_access_token_here",
+  "refreshToken": "your_refresh_token_here"
+}
+
+###
+
+## Change password (requires authentication)
+POST {{BrightBudget.API_HostAddress}}/api/auth/change-password
+Content-Type: application/json
+Authorization: Bearer your_access_token_here
+
+{
+  "currentPassword": "TestPassword123!",
+  "newPassword": "NewSecurePassword456!"
+}
+
+###
+
+## Logout to invalidate refresh token
+POST {{BrightBudget.API_HostAddress}}/api/auth/logout
+Authorization: Bearer your_access_token_here
+
+###
+
+# Wallet Endpoints (example of protected endpoints)
+## Get user wallets (requires authentication)
+GET {{BrightBudget.API_HostAddress}}/api/wallet
+Authorization: Bearer your_access_token_here
 
 ###

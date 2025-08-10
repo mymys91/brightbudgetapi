@@ -1,0 +1,62 @@
+### Test Authentication Flow with Refresh Tokens
+
+# 1. Register a new user
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "TestPassword123!"
+}
+
+###
+
+# 2. Login to get access token and refresh token
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "TestPassword123!"
+}
+
+###
+
+# 3. Get current user info (requires authentication)
+GET {{baseUrl}}/api/auth/me
+Authorization: Bearer your_access_token_here
+
+###
+
+# 4. Use refresh token to get new access token
+# Replace the tokens with actual values from login response
+POST {{baseUrl}}/api/auth/refresh
+Content-Type: application/json
+
+{
+  "accessToken": "your_access_token_here",
+  "refreshToken": "your_refresh_token_here"
+}
+
+###
+
+# 5. Change password (requires authentication)
+POST {{baseUrl}}/api/auth/change-password
+Content-Type: application/json
+Authorization: Bearer your_access_token_here
+
+{
+  "currentPassword": "TestPassword123!",
+  "newPassword": "NewSecurePassword456!"
+}
+
+###
+
+# 6. Logout to invalidate refresh token
+POST {{baseUrl}}/api/auth/logout
+Authorization: Bearer your_access_token_here
+
+###
+
+# Variables (replace with your actual values)
+@baseUrl = https://localhost:7001

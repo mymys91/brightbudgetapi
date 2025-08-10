@@ -1,4 +1,5 @@
 using BrightBudget.API.Data;
+using BrightBudget.API.Extensions;
 using BrightBudget.API.Middleware;
 using BrightBudget.API.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -22,6 +23,16 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngular",
+        policy => policy.WithOrigins(allowedOrigins)
+                        .AllowAnyHeader()
+                        .AllowAnyMethod());
+});
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -41,14 +52,19 @@ builder.Services.AddAuthentication(options =>
 });
 builder.Services.AddAutoMapper(typeof(Program));
 
+// Register application services
+builder.Services.AddApplicationServices();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
 app.UseMiddleware<ErrorHandlingMiddleware>();
+app.UseCurrentUser();
 
 app.UseHttpsRedirection();
+app.UseCors("AllowAngular");
 app.UseAuthentication();
 app.UseAuthorization();
 if (app.Environment.IsDevelopment())
