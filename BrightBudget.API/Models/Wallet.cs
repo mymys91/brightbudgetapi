@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using BrightBudget.API.Enums;
 
 namespace BrightBudget.API.Models
 {
@@ -9,9 +10,12 @@ namespace BrightBudget.API.Models
         [Required]
         public string Name { get; set; } = null!;
 
-        public decimal InitialBalance { get; set; }
+        public int WalletTypeId { get; set; }
+        public WalletType WalletType { get; set; } = null!;
 
-        public string Currency { get; set; } = "VND";
+        public decimal Balance { get; set; }
+
+        public CurrencyCode CurrencyCode { get; set; }
 
         public string UserId { get; set; } = null!;
         public ApplicationUser? User { get; set; }

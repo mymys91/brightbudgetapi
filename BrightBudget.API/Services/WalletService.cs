@@ -3,15 +3,19 @@ using BrightBudget.API.Models;
 using BrightBudget.API.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using BrightBudget.API.Data;
+using AutoMapper;
 
 namespace BrightBudget.API.Services
 {
     public class WalletService : IWalletService
     {
+        private readonly IMapper _mapper;
+
         private readonly AppDbContext _context;
 
-        public WalletService(AppDbContext context)
+        public WalletService(IMapper mapper, AppDbContext context)
         {
+            _mapper = mapper;
             _context = context;
         }
 
@@ -38,13 +42,8 @@ namespace BrightBudget.API.Services
 
         public async Task<Wallet> CreateAsync(WalletCreateDto dto, string userId)
         {
-            var wallet = new Wallet
-            {
-                Name = dto.Name,
-                InitialBalance = dto.InitialBalance,
-                Currency = dto.Currency,
-                UserId = userId
-            };
+            var wallet = _mapper.Map<Wallet>(dto);
+            wallet.UserId = userId;
 
             _context.Wallets.Add(wallet);
             await _context.SaveChangesAsync();
@@ -61,7 +60,6 @@ namespace BrightBudget.API.Services
                 return false;
 
             wallet.Name = dto.Name;
-            wallet.Currency = dto.Currency;
 
             await _context.SaveChangesAsync();
             return true;

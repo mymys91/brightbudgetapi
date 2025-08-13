@@ -4,11 +4,12 @@ using BrightBudget.API.Models;
 
 namespace BrightBudget.API.Mappings
 {
-    public class MappingProfile : Profile
+    public class WalletProfile : Profile
     {
-        public MappingProfile()
+        public WalletProfile()
         {
-            CreateMap<Wallet, WalletReadDto>();
+            CreateMap<Wallet, WalletReadDto>().ForMember(dest => dest.CurrencyCode,
+               opt => opt.MapFrom(src => src.CurrencyCode.ToString()));           
             CreateMap<WalletCreateDto, Wallet>();
             CreateMap<WalletUpdateDto, Wallet>();
         }

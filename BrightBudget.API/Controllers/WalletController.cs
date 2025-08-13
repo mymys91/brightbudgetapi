@@ -5,6 +5,7 @@ using BrightBudget.API.Models;
 using BrightBudget.API.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using AutoMapper;
 
 namespace BrightBudget.API.Controllers
 {
@@ -15,10 +16,12 @@ namespace BrightBudget.API.Controllers
     public class WalletController : BaseApiController
     {
         private readonly IWalletService _walletService;
+        private readonly IMapper _mapper;
 
-        public WalletController(IWalletService walletService)
+        public WalletController(IWalletService walletService, IMapper mapper)
         {
             _walletService = walletService;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -28,14 +31,7 @@ namespace BrightBudget.API.Controllers
             {
                 var user = HttpContext.GetCurrentUser()!; // User is guaranteed to exist due to filter
                 var wallets = await _walletService.GetByUserIdAsync(user.Id);
-                var walletDtos = wallets.Select(w => new WalletReadDto
-                {
-                    Id = w.Id,
-                    Name = w.Name,
-                    InitialBalance = w.InitialBalance,
-                    Currency = w.Currency
-                });
-
+                var walletDtos = _mapper.Map<List<WalletReadDto>>(wallets);
                 return Success(walletDtos);
             }
             catch (Exception ex)
@@ -58,14 +54,7 @@ namespace BrightBudget.API.Controllers
                 if (wallet.UserId != user.Id)
                     return Forbid();
 
-                var walletDto = new WalletReadDto
-                {
-                    Id = wallet.Id,
-                    Name = wallet.Name,
-                    InitialBalance = wallet.InitialBalance,
-                    Currency = wallet.Currency
-                };
-
+                var walletDto = _mapper.Map<WalletReadDto>(wallet);
                 return Success(walletDto);
             }
             catch (Exception ex)
@@ -82,16 +71,9 @@ namespace BrightBudget.API.Controllers
                 var user = HttpContext.GetCurrentUser()!; // User is guaranteed to exist due to filter
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
-
+              
                 var wallet = await _walletService.CreateAsync(dto, user.Id);
-                var walletDto = new WalletReadDto
-                {
-                    Id = wallet.Id,
-                    Name = wallet.Name,
-                    InitialBalance = wallet.InitialBalance,
-                    Currency = wallet.Currency
-                };
-
+                var walletDto = _mapper.Map<WalletReadDto>(wallet);
                 return CreatedAtAction(nameof(GetWallet), new { id = wallet.Id }, Success(walletDto));
             }
             catch (Exception ex)

@@ -9,12 +9,8 @@ namespace BrightBudget.API.Extensions
         {
             // Register all application services here
             services.AddWalletServices();
-            
-            // Add more service groups here as needed
-            // services.AddUserServices();
-            // services.AddTransactionServices();
-            // services.AddCategoryServices();
-            
+            services.AddTransactionServices();
+           
             return services;
         }
 
@@ -23,20 +19,11 @@ namespace BrightBudget.API.Extensions
             services.AddScoped<IWalletService, WalletService>();
             return services;
         }
-
-        // Example of how to organize services by domain
-        // private static IServiceCollection AddUserServices(this IServiceCollection services)
-        // {
-        //     services.AddScoped<IUserService, UserService>();
-        //     services.AddScoped<IUserProfileService, UserProfileService>();
-        //     return services;
-        // }
-
-        // private static IServiceCollection AddTransactionServices(this IServiceCollection services)
-        // {
-        //     services.AddScoped<ITransactionService, TransactionService>();
-        //     services.AddScoped<ITransactionCategoryService, TransactionCategoryService>();
-        //     return services;
-        // }
+        
+        private static IServiceCollection AddTransactionServices(this IServiceCollection services)
+        {
+            services.AddScoped<ITransactionService, TransactionService>();
+            return services;
+        }      
     }
 }
