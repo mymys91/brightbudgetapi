@@ -18,37 +18,37 @@ namespace BrightBudget.API.Services
             _mapper = mapper;
             _context = context;
         }
-
-        public async Task<IEnumerable<Wallet>> GetAllAsync()
+       
+        public async Task<WalletReadDto?> GetByIdAsync(int id, string userId)
         {
-            return await _context.Wallets
-                .Include(w => w.User)
-                .ToListAsync();
+           var wallet = await _context.Wallets
+                            .Include(w => w.WalletType)
+                            .FirstOrDefaultAsync(w => w.Id == id && w.UserId == userId);
+            if (wallet == null)
+                return null;
+            return  _mapper.Map<WalletReadDto>(wallet);
         }
 
-        public async Task<Wallet?> GetByIdAsync(int id)
+        public async Task<IEnumerable<WalletReadDto>> GetByUserIdAsync(string userId)
         {
-            return await _context.Wallets
-                .Include(w => w.User)
-                .FirstOrDefaultAsync(w => w.Id == id);
-        }
-
-        public async Task<IEnumerable<Wallet>> GetByUserIdAsync(string userId)
-        {
-            return await _context.Wallets
+            var wallets = await _context.Wallets
+                .Include(w => w.WalletType)
                 .Where(w => w.UserId == userId)
                 .ToListAsync();
+
+            return _mapper.Map<IEnumerable<WalletReadDto>>(wallets);
         }
 
-        public async Task<Wallet> CreateAsync(WalletCreateDto dto, string userId)
+        public async Task<WalletReadDto> CreateAsync(WalletCreateDto dto, string userId)
         {
             var wallet = _mapper.Map<Wallet>(dto);
             wallet.UserId = userId;
 
             _context.Wallets.Add(wallet);
             await _context.SaveChangesAsync();
+            wallet.WalletType = await _context.WalletTypes.FirstAsync(t => t.Id == wallet.WalletTypeId);
 
-            return wallet;
+            return _mapper.Map<WalletReadDto>(wallet);;
         }
 
         public async Task<bool> UpdateAsync(int id, WalletUpdateDto dto, string userId)

@@ -7,5 +7,7 @@ namespace BrightBudget.API.Dtos.Transaction
         public string? Description { get; set; }
         public DateTime Date { get; set; }
         public int WalletId { get; set; }
+        public int TransactionCategoryId { get; set; }
+        public string TransactionCategoryName { get; set; } = null!;
     }
 }

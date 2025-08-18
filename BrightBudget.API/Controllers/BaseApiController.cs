@@ -26,5 +26,14 @@ namespace BrightBudget.API.Controllers
         {
             return BadRequest(ApiResponse<IEnumerable<string>>.Fail(errors));
         }
+
+        protected IActionResult HandleException(Exception ex, string userMessage = "An error occurred")
+        {
+            return BadRequest(new
+            {
+                message = userMessage,
+                error = ex.Message
+            });
+        }
     }
 }

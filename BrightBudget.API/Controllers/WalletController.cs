@@ -1,11 +1,11 @@
 using BrightBudget.API.Dtos.Wallet;
 using BrightBudget.API.Extensions;
 using BrightBudget.API.Filters;
-using BrightBudget.API.Models;
 using BrightBudget.API.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
+using BrightBudget.API.Data;
 
 namespace BrightBudget.API.Controllers
 {
@@ -16,12 +16,11 @@ namespace BrightBudget.API.Controllers
     public class WalletController : BaseApiController
     {
         private readonly IWalletService _walletService;
-        private readonly IMapper _mapper;
-
-        public WalletController(IWalletService walletService, IMapper mapper)
+        private readonly AppDbContext _context;
+        public WalletController(IWalletService walletService, AppDbContext context)
         {
             _walletService = walletService;
-            _mapper = mapper;
+            _context = context;
         }
 
         [HttpGet]
@@ -30,13 +29,12 @@ namespace BrightBudget.API.Controllers
             try
             {
                 var user = HttpContext.GetCurrentUser()!; // User is guaranteed to exist due to filter
-                var wallets = await _walletService.GetByUserIdAsync(user.Id);
-                var walletDtos = _mapper.Map<List<WalletReadDto>>(wallets);
+                var walletDtos = await _walletService.GetByUserIdAsync(user.Id);
                 return Success(walletDtos);
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = "Failed to retrieve wallets", error = ex.Message });
+                return HandleException(ex, "Failed to retrieve wallets");
             }
         }
 
@@ -46,15 +44,10 @@ namespace BrightBudget.API.Controllers
             try
             {
                 var user = HttpContext.GetCurrentUser()!; // User is guaranteed to exist due to filter
-                var wallet = await _walletService.GetByIdAsync(id);
-                if (wallet == null)
+                var walletDto = await _walletService.GetByIdAsync(id, user.Id);
+                if (walletDto == null)
                     return NotFound(new { message = "Wallet not found" });
 
-                // Ensure user can only access their own wallets
-                if (wallet.UserId != user.Id)
-                    return Forbid();
-
-                var walletDto = _mapper.Map<WalletReadDto>(wallet);
                 return Success(walletDto);
             }
             catch (Exception ex)
@@ -71,14 +64,13 @@ namespace BrightBudget.API.Controllers
                 var user = HttpContext.GetCurrentUser()!; // User is guaranteed to exist due to filter
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
-              
-                var wallet = await _walletService.CreateAsync(dto, user.Id);
-                var walletDto = _mapper.Map<WalletReadDto>(wallet);
-                return CreatedAtAction(nameof(GetWallet), new { id = wallet.Id }, Success(walletDto));
+
+                var walletDto = await _walletService.CreateAsync(dto, user.Id);
+                return Success(walletDto);
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = "Failed to create wallet", error = ex.Message });
+                return HandleException(ex, "Failed to create wallet");
             }
         }
 
@@ -99,8 +91,8 @@ namespace BrightBudget.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = "Failed to update wallet", error = ex.Message });
-            }
+                 return HandleException(ex, "Failed to update wallet");
+            } 
         }
 
         [HttpDelete("{id}")]
@@ -117,7 +109,7 @@ namespace BrightBudget.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = "Failed to delete wallet", error = ex.Message });
+                return HandleException(ex, "Failed to delete wallet");
             }
         }
     }
